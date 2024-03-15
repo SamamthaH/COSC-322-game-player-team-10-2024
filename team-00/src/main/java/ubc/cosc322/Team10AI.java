@@ -9,6 +9,8 @@ import java.util.Map;
 public class Team10AI extends GamePlayer {
     private GameClient gameClient = null;
     private BaseGameGUI gamegui = null;
+    private AccessibleBoard board = null;
+    private int colour = -1;
 
     private String userName = null;
     private String passwd = null;
@@ -25,6 +27,7 @@ public class Team10AI extends GamePlayer {
         //To make a GUI-based player, create an instance of BaseGameGUI
         //and implement the method getGameGUI() accordingly
         this.gamegui = new BaseGameGUI(this);
+        this.board = new AccessibleBoard();
     }
 
     /**
@@ -87,15 +90,27 @@ public class Team10AI extends GamePlayer {
             System.out.println(msgDetails.get("game-state"));
             System.out.println("success\n\n\n");
             this.gamegui.setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
+            this.board.setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
         }
         else if (messageType.equals(GameMessage.GAME_ACTION_MOVE)){
             this.gamegui.updateGameState(msgDetails);
+            this.board.updateGameState(msgDetails);
         }
         else if (messageType.equals(GameMessage.GAME_ACTION_START)){
             System.out.println("Game start" + msgDetails.get("game-state"));
             this.gamegui.setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
+            this.board.setGameState((ArrayList<Integer>) msgDetails.get("game-state"));
             System.out.println("Black player" + msgDetails.get("player-black"));
             System.out.println("White player" + msgDetails.get("player-white"));
+
+            if(msgDetails.get("player-black").equals(userName)){
+                colour = 1;
+            }
+            else {
+                colour = 2;
+            }
+            ActionFactory a = new ActionFactory();
+            a.getActions(board, colour);
         }
     	System.out.println(msgDetails);
         return true;
